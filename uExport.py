@@ -4,6 +4,8 @@ Christopher Evans, Version 0.1, Feb 2014
 @author = Chris Evans
 version = 0.85
 
+edited 3/1/18 - RR-VRC
+
 Add this to a shelf:
 import uExport as ue
 uExportToolWindow = ue.show()
@@ -26,11 +28,12 @@ import maya.OpenMayaUI as openMayaUI
 import maya.mel as mel
 
 # legacy support
-from Qt import QtGui, QtWidgets, QtCore
 if cmds.about(v=True) <= "2016":
+    from Qt import QtGui, QtWidgets, QtCore
     import shiboken
     import pysideuic
 else:
+    from PySide2 import QtGui, QtWidgets, QtCore
     import shiboken2 as shiboken
     import pyside2uic as pysideuic
 
@@ -100,7 +103,8 @@ def msgConnect(attribFrom, attribTo, debug=0):
     # TODO needs a mode to dump all current connections (overwrite/force)
     objFrom, attFrom = attribFrom.split('.')
     objTo, attTo = attribTo.split('.')
-    if debug: print 'msgConnect>>> Locals:', locals()
+    if debug: 
+        print 'msgConnect>>> Locals: ', locals()
     if not attrExists(attribFrom):
         cmds.addAttr(objFrom, longName=attFrom, attributeType='message')
     if not attrExists(attribTo):
@@ -1179,6 +1183,7 @@ class uExportTool(base_class, form_class):
             self.missingFilesTree.header().resizeSections(QtWidgets.QHeaderView.ResizeToContents)
 
     def createUexportNode_FN(self):
+        # get curr selection
         if cmds.ls(sl=1):
             if self.useRoot_CHK.isChecked():
                 rootName = self.rootName_CMB.currentText()
@@ -1453,7 +1458,9 @@ class uExportTool(base_class, form_class):
 ## UEXPORT NODE
 ########################################################################
     def getExportNodes(self):
-        return cmds.ls('*.uexport_ver', o=1, r=1)
+        exp = cmds.ls('*.uexport_ver', o=1, r=1)
+        print "\nGetting export nodes: " + str(exp)
+        return exp
 
     def connectRoot(self, uNode, root, rewire=1):
         try:
